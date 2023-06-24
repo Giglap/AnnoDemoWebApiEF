@@ -29,7 +29,7 @@ namespace AnnoDemoWebApiEF.Controllers
           {
               return NotFound();
           }
-            return await _context.Annotations.ToListAsync();
+            return await _context.Annotations.OrderBy(a => a.BeginTime).ToListAsync();
         }
 
         // GET: api/Annotations/5
@@ -120,5 +120,116 @@ namespace AnnoDemoWebApiEF.Controllers
         {
             return (_context.Annotations?.Any(e => e.Id == id)).GetValueOrDefault();
         }
+        //*********************************************************************************************************
+
+        // GET: api/Annotations/user/john
+        [HttpGet("user/{user}")]
+        public async Task<ActionResult<IEnumerable<Annotation>>> GetAnnotationsByUser(string user)
+        {
+            if (_context.Annotations == null)
+            {
+                return NotFound();
+            }
+            var annotations = await _context.Annotations.Where(a => a.User == user).OrderBy(a => a.BeginTime).ToListAsync();
+
+            if (annotations == null || annotations.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return annotations;
+        }
+
+        // GET: api/Annotations/time/100/200
+        [HttpGet("time/{start}/{end}")]
+        public async Task<ActionResult<IEnumerable<Annotation>>> GetAnnotationsByTime(int start, int end)
+        {
+            if (_context.Annotations == null)
+            {
+                return NotFound();
+            }
+            var annotations = await _context.Annotations.Where(a => a.BeginTime >= start && a.BeginTime <= end).OrderBy(a => a.BeginTime).ToListAsync();
+
+            if (annotations == null || annotations.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return annotations;
+        }
+
+        // GET: api/Annotations/time/100/200/user/john/imdbid/tt1234567
+        [HttpGet("time/{start}/{end}/user/{user}/imdbid/{imdbid}")]
+        public async Task<ActionResult<IEnumerable<Annotation>>> GetAnnotationsByTimeUserImdbId(int start, int end, string user, string imdbid)
+        {
+            if (_context.Annotations == null)
+            {
+                return NotFound();
+            }
+            var annotations = await _context.Annotations.Where(a => a.BeginTime >= start && a.BeginTime <= end && a.User == user && a.ImdbId == imdbid).OrderBy(a => a.BeginTime).ToListAsync();
+
+            if (annotations == null || annotations.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return annotations;
+        }
+
+        // GET: api/Annotations/user/john/imdbids
+        [HttpGet("user/{user}/imdbids")]
+        public async Task<ActionResult<IEnumerable<string>>> GetImdbIdsByUser(string user)
+        {
+            if (_context.Annotations == null)
+            {
+                return NotFound();
+            }
+            var imdbids = await _context.Annotations.Where(a => a.User == user).Select(a => a.ImdbId).Distinct().ToListAsync();
+
+            if (imdbids == null || imdbids.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return imdbids;
+        }
+
+        // GET: api/Annotations/user/john/imdbid/tt1234567
+        [HttpGet("user/{user}/imdbid/{imdbid}")]
+        public async Task<ActionResult<IEnumerable<Annotation>>> GetAnnotationsByUserImdbId(string user, string imdbid)
+        {
+            if (_context.Annotations == null)
+            {
+                return NotFound();
+            }
+            var annotations = await _context.Annotations.Where(a => a.User == user && a.ImdbId == imdbid).OrderBy(a => a.BeginTime).ToListAsync();
+
+            if (annotations == null || annotations.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return annotations;
+        }
+
+        // GET: api/Annotations/imdbid/tt1234567
+        [HttpGet("imdbid/{imdbid}")]
+        public async Task<ActionResult<IEnumerable<Annotation>>> GetAnnotationsByImdbId(string imdbid)
+        {
+            if (_context.Annotations == null)
+            {
+                return NotFound();
+            }
+            var annotations = await _context.Annotations.Where(a => a.ImdbId == imdbid).OrderBy(a => a.BeginTime).ToListAsync();
+
+            if (annotations == null || annotations.Count == 0)
+            {
+                return NotFound();
+            }
+
+            return annotations;
+        }
+
+
     }
 }
